@@ -1,6 +1,6 @@
 {% load qhonuskan_votes %}
-<div class="vote_buttons" x:model="{{vote_model}}" x:id="{{object.id}}">
-    <div class="score">{% if object.vote_score %}{{object.vote_score}}{% else %}0{% endif %}</div>
-    <a href="#" class="upVote{% if object|is_up_voted_by:user %} voted{%endif%}" x:value="1" ></a>
-    <a href="#" class="downVote{% if object|is_down_voted_by:user %} voted{%endif%}" x:value="-1"></a>
+<div class="vote_buttons" data-model="{{ vote_model }}" data-id="{{ object.id }}">
+    <div class="score">{{ object.vote_score|default_if_none:0 }}</div>
+    <a href="#" class="upVote{% if object|is_up_voted_by:user %} voted{% endif %}" data-value="1"></a>
+    <a href="#" class="downVote{% if object|is_down_voted_by:user %} voted{% endif %}" data-value="-1"></a>
 </div>

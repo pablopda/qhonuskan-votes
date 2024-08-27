@@ -3,8 +3,9 @@ from django.http import (
     HttpResponse, HttpResponseRedirect, HttpResponseForbidden,
     HttpResponseBadRequest, JsonResponse)
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
-from qhonuskan_votes.utils import get_vote_model, SumWithDefault
+from qhonuskan_votes.utils import get_vote_model, sum_with_default
 from qhonuskan_votes.exceptions import InvalidVoteModel
 from qhonuskan_votes.logutils import setup_loghandlers
 
@@ -50,6 +51,7 @@ def _api_view(func):
 
 
 @csrf_exempt
+@login_required
 @_api_view
 def vote(request, model, object_id, value):
     """
@@ -77,6 +79,6 @@ def vote(request, model, object_id, value):
 
     response_dict = model.objects.filter(
         object__id=object_id
-    ).aggregate(score=SumWithDefault("value", default=0))
+    ).aggregate(score=sum_with_default("value", default=0))
     response_dict.update({"voted_as": value})
     return JsonResponse(response_dict)

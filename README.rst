@@ -2,171 +2,153 @@
 Qhonuskan-Votes
 ===============
 
-Easy to use reddit like voting system for django models.
+Easy to use reddit-like voting system for Django models.
 
 Features
 --------
 
-*  Does not use GenericForeignKeys (which irritates me when making queries)
-   Has vote_buttons_for templatetag, that generates html code for your object
-   for vote buttons.
+* Does not use GenericForeignKeys (which can complicate queries)
+* Provides vote_buttons_for templatetag to generate HTML code for vote buttons
+* Includes default_buttons.css for basic styling (can be overridden)
+* voting_script template tag generates JavaScript code for AJAX voting requests
+* Pure CSS buttons by default (no images required)
+* Compatible with Django 3.2+
+* Supports Python 3.6+
 
-*  Has, default_buttons.css which gives a shape your buttons as default, but
-   you can override.
+What's new in version 0.3.0?
+----------------------------
 
-*  Has, voting_script template tag, it generates javascript code to make
-   ajax requests for voting. Automatically finds qhonuskan_votes views.
-
-*  voting_script tag also renders overridable show_not_authenticated_error
-   function, so you can use your own error windows (jquery-ui etc.) via
-   overriding it.
-
-*  Default buttons are pure css, there is no images. So it's lite.
-
-What's new?
------------
-version 0.2
-'''''''''''
-* Defined ``get_version`` method to get project version in your code.
-* Lettuce tests are added for testing voting system.
-* Changed ``vote`` view name as ``qhonuskan_vote``. Prefix is required for
-  minimizing view name conflicts.
-* Moved templates to ``templates/qhonuskan`` directory.
-* Minimum Django version that we supported is 1.3.
-
+* Updated for Django 3.2 compatibility
+* Dropped support for Python 2.7, now requires Python 3.6+
+* Replaced custom SumWithDefault with Django's Coalesce and Sum
+* Modernized JavaScript to use vanilla JS and Fetch API
+* Improved error handling and authentication checks
+* Added CSRF token handling for AJAX requests
+* Updated Signal usage to remove deprecated features
 
 Quick Implementation Guide
 --------------------------
 
-1. Add qhonuskan_votes to your INSTALLED_APPS.
+1. Install qhonuskan-votes:
 
    ::
 
-     INSTALLED_APPS = ('...',
-                       '...',
-                       'qhonuskan_votes')
+     pip install qhonuskan-votes
 
+2. Add qhonuskan_votes to your INSTALLED_APPS:
 
-2. Add **VotesField**, and add **ObjectsWithScoresManager** to your model.
+   ::
+
+     INSTALLED_APPS = (
+         ...
+         'qhonuskan_votes',
+     )
+
+3. Add VotesField and managers to your model:
 
    ::
 
      from django.db import models
-     from qhonuskan_votes.models import VotesField
+     from qhonuskan_votes.models import VotesField, ObjectsWithScoresManager, SortByScoresManager
 
      class MyModel(models.Model):
          votes = VotesField()
-	 # Add objects before all other managers to avoid issues mention in http://stackoverflow.com/a/4455374/1462141
-	 objects = models.Manager()
-
-	 #For just a list of objects that are not ordered that can be customized.
+         objects = models.Manager()
          objects_with_scores = ObjectsWithScoresManager()
-
-	 #For a objects ordered by score.
-	 sort_by_score = SortByScoresManager()
-         ...
+         sort_by_score = SortByScoresManager()
          ...
 
-3. Syncdb.
-4. Extend your urls [#]_.
-   ::
-
-     import qhonuskan_votes.urls
-     from django.conf.urls.defaults import *
-
-     urlpatterns = patterns('',
-       ...
-       ...
-       url(r'^votes/', include(qhonuskan_votes.urls)),
-     )
-
-5. Create the list in you view. Use
+4. Run migrations:
 
    ::
 
-     #For a regular list of items without votes from your model use the following:
-     item_list_no_score = Items.objects.all()
+     python manage.py migrate
 
-     #For a list with scores that can be customized with use the following:
-     item_list_unordered_with_scores = Items.objects_with_scores.all()
-     #to customize the order by a field unique to your model. So something like this:
-     item_list_unordered_with_scores = Items.objects_with_scores.all().order_by(-date_created)
+5. Include qhonuskan_votes URLs in your project's urls.py:
 
-     #To obtain a list of items sorted by vote counts like (1,0,-1) like Reddit:
-     item_list_ordered__scores = Items.sort_by_score.all()
+   ::
 
+     from django.urls import include, path
 
-6. Load qhonuskan_votes templatetags from your template. You will need STATIC_PREFIX too.
+     urlpatterns = [
+         ...
+         path('votes/', include('qhonuskan_votes.urls')),
+     ]
+
+6. In your view, you can now use:
+
+   ::
+
+     # Regular queryset
+     items = MyModel.objects.all()
+
+     # Queryset with vote scores
+     items_with_scores = MyModel.objects_with_scores.all()
+
+     # Queryset sorted by vote scores
+     items_sorted_by_score = MyModel.sort_by_score.all()
+
+7. In your template, load the required tags and styles:
 
    ::
 
      {% load qhonuskan_votes static %}
      {% get_static_prefix as STATIC_PREFIX %}
 
-
-7. Load default_buttons.css to give little shape to buttons
-
-   ::
-
-     <link href="{{STATIC_PREFIX}}default_buttons.css" rel="stylesheet" type="text/css" />
-
-8. After that line, if you wish you can override some properties
-
-   ::
-
-     <style type="text/css">
-       div.vote_buttons {
-         width: 40px;
-         margin-right: 5px;
-         float: left;
-         border: 1px solid #666;
-       }
-     </style>
-
-9. Load jquery to your template
-
-   ::
-
-     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-
-10. After all, you can add voting_script template tag to your head section.
-It generates necessary javascript code for ajax requests.
-
-   ::
-
+     <link href="{{ STATIC_PREFIX }}default_buttons.css" rel="stylesheet" type="text/css" />
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
      {% voting_script %}
 
-11. use vote_buttons_for_object template tag to create buttons.
+8. Use the vote_buttons_for template tag to create buttons:
 
-    ::
+   ::
 
-      {% for object in objects %}
-        <div class="object">
-          {% vote_buttons_for object %}
-            <div class="text">
-              {{ object.text }}
-            </div>
-        </div>
-      {% endfor %}
+     {% for object in objects %}
+       <div class="object">
+         {% vote_buttons_for object %}
+         <div class="text">
+           {{ object.text }}
+         </div>
+       </div>
+     {% endfor %}
 
-For further information you can inspect example project at root of the repository.
+For more detailed information, please refer to the documentation.
+
+Upgrading from Previous Versions
+--------------------------------
+
+If you're upgrading from a version prior to 0.3.0, please note the following:
+
+1. Ensure your project is using Django 3.2+ and Python 3.6+.
+2. Update your requirements to include the latest version of qhonuskan-votes.
+3. Run `python manage.py migrate` to apply any new migrations.
+4. Update your JavaScript code if you've customized the voting functionality. The new version uses vanilla JS and the Fetch API instead of jQuery.
+5. If you're using custom templates, update them to use the new data attributes instead of the old x: attributes.
+6. Review your views and ensure they're compatible with the new managers (ObjectsWithScoresManager and SortByScoresManager).
+7. If you were relying on the old `SumWithDefault` in your custom code, replace it with the new `sum_with_default` function from `qhonuskan_votes.utils`.
+8. Test your application thoroughly after upgrading, paying special attention to voting functionality and score calculations.
+
+For any issues during upgrade, please refer to the project's issue tracker on GitHub.
 
 Contribution
 ------------
-You liked this project? Nice. Let's start with provide your virtual
-environment. You can install all you need dependencies::
 
-    $ pip install -r requirements/development.txt
+Contributions are welcome! To contribute:
 
-We have some important conditions during the development of the project:
+1. Fork the repository
+2. Create a virtual environment and install dependencies:
+   ::
 
-* We adopt PEP8 as Python style guide.
-* You can send us patch for reviewing changes, but if you fork the project
-  and open a pull request from github, that would be very easy for us.
+     pip install -r requirements/development.txt
 
+3. Make your changes, following PEP8 style guide
+4. Write tests for your changes
+5. Run the test suite
+6. Submit a pull request
 
-FootNotes
----------
-.. [#] To use the views for up voting and down voting you include the urls.py in your
-       website's url patterns. You can serve qhonuskan_votes views wherever you
-       want. Javascript files updates automatically to find qhonuskan_votes views.
+Please ensure your code adheres to the project's coding standards and is well-documented.
+
+License
+-------
+
+This project is licensed under the GPL License.
