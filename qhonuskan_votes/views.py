@@ -59,20 +59,21 @@ def vote(request, model, object_id, value):
     Likes or dislikes an item.
     """
     with transaction.atomic():
-        vote_instances = model.objects.filter(
-            object__id=object_id,
-            voter=request.user
+        vote_instance, created = model.objects.get_or_create(
+            object_id=object_id,
+            voter=request.user,
+            defaults={'value': value}
         )
         
-        if vote_instances.exists():
-            vote_instance = vote_instances.first()
+        if not created:
             if vote_instance.value == value:
-                vote_instances.delete()
+                # Delete the vote if the user voted the same way twice
+                vote_instance.delete()
                 value = 0
             else:
-                vote_instances.update(value=value)
-        else:
-            model.objects.create(object_id=object_id, voter=request.user, value=value)
+                # If the user changes their vote, update it
+                vote_instance.value = value
+                vote_instance.save()
 
     response_dict = model.objects.filter(
         object__id=object_id
