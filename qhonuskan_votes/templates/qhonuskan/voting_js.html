@@ -46,11 +46,14 @@
             }
 
             voteEl.querySelectorAll('.upVote, .downVote').forEach(function(button) {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();  // Prevent event bubbling
-                    vote(this.dataset.value);
-                });
+                if (!button.hasAttribute('data-listener-added')) {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();  // Prevent event bubbling
+                        vote(this.dataset.value);
+                    });
+                    button.setAttribute('data-listener-added', 'true');
+                }
             });
         });
     });
