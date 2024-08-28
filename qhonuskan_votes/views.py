@@ -57,22 +57,31 @@ def _api_view(func):
 def vote(request, model, object_id, value):
     """
     Likes or dislikes an item.
+    We allow users to vote multiple times, but we only want to store the most recent vote.
+    If the user votes the same way twice, we delete all votes.
+    If the user changes their vote, we update the first vote and delete the others.
+    
+    If the front end sends multiple votes from the same user for the same object,
+    we only want to store the most recent vote.
     """
     with transaction.atomic():
-        try:
-            vote_instance = model.objects.get(
-                object_id=object_id,
-                voter=request.user
-            )
+        vote_instances = model.objects.filter(
+            object_id=object_id,
+            voter=request.user
+        )
+        
+        if vote_instances.exists():
+            vote_instance = vote_instances.first()
             if vote_instance.value == value:
-                # Delete the vote if the user voted the same way twice
-                vote_instance.delete()
+                # Delete all votes if the user voted the same way
+                vote_instances.delete()
                 value = 0
             else:
-                # If the user changes their vote, update it
+                # If the user changes their vote, update the first and delete others
                 vote_instance.value = value
                 vote_instance.save()
-        except model.DoesNotExist:
+                vote_instances.exclude(pk=vote_instance.pk).delete()
+        else:
             # Create a new vote if it doesn't exist
             vote_instance = model.objects.create(
                 object_id=object_id,
