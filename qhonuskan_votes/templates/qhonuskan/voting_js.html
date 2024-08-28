@@ -6,11 +6,10 @@
         document.querySelectorAll(".vote_buttons").forEach(function(voteEl) {
             let isVoting = false;
 
-            voteEl.addEventListener("vote", function(event) {
+            function vote(value) {
                 if (isVoting) return;
                 isVoting = true;
 
-                const value = event.detail;
                 fetch('{{ vote_url }}', {
                     method: 'POST',
                     headers: {
@@ -44,12 +43,13 @@
                 .finally(() => {
                     isVoting = false;
                 });
-            });
+            }
 
             voteEl.querySelectorAll('.upVote, .downVote').forEach(function(button) {
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
-                    voteEl.dispatchEvent(new CustomEvent("vote", { detail: this.dataset.value }));
+                    e.stopPropagation();  // Prevent event bubbling
+                    vote(this.dataset.value);
                 });
             });
         });
