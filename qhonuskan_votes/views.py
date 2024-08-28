@@ -4,6 +4,7 @@ from django.http import (
     HttpResponseBadRequest, JsonResponse)
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 
 from qhonuskan_votes.utils import get_vote_model, sum_with_default
 from qhonuskan_votes.exceptions import InvalidVoteModel
@@ -57,25 +58,21 @@ def vote(request, model, object_id, value):
     """
     Likes or dislikes an item.
     """
-    try:
-        vote_instance = model.objects.get(
+    with transaction.atomic():
+        vote_instances = model.objects.filter(
             object__id=object_id,
             voter=request.user
         )
-    except model.DoesNotExist:
-        vote_instance = None
-
-    # If there is already a vote
-    if vote_instance:
-        if vote_instance.value == value:
-            vote_instance.delete()
-            value = 0
+        
+        if vote_instances.exists():
+            vote_instance = vote_instances.first()
+            if vote_instance.value == value:
+                vote_instances.delete()
+                value = 0
+            else:
+                vote_instances.update(value=value)
         else:
-            vote_instance.value = value
-            vote_instance.save()
-    else:
-        vote_instance = model.objects.create(
-            object_id=object_id, voter=request.user, value=value)
+            model.objects.create(object_id=object_id, voter=request.user, value=value)
 
     response_dict = model.objects.filter(
         object__id=object_id

@@ -4,7 +4,12 @@
     }
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll(".vote_buttons").forEach(function(voteEl) {
+            let isVoting = false;
+
             voteEl.addEventListener("vote", function(event) {
+                if (isVoting) return;
+                isVoting = true;
+
                 const value = event.detail;
                 fetch('{{ vote_url }}', {
                     method: 'POST',
@@ -35,6 +40,9 @@
                     } else {
                         console.error('Error:', error);
                     }
+                })
+                .finally(() => {
+                    isVoting = false;
                 });
             });
 
