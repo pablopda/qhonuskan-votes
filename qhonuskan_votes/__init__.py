@@ -1,7 +1,7 @@
 __version_info__ = {
     'major': 0,
-    'minor': 3,  # Increment the minor version
-    'micro': 1,
+    'minor': 4,  # Increment the minor version
+    'micro': 0,
     'releaselevel': 'final',
 }
 

@@ -12,8 +12,14 @@ Features
 * Includes default_buttons.css for basic styling (can be overridden)
 * voting_script template tag generates JavaScript code for AJAX voting requests
 * Pure CSS buttons by default (no images required)
-* Compatible with Django 3.2+
-* Supports Python 3.6+
+* Compatible with Django 4.2+
+* Supports Python 3.9+
+
+What's new in version 0.4.0?
+----------------------------
+
+* Updated for Django 4.2 compatibility
+* Dropped support for Python 3.6, 3.7, 3.8
 
 What's new in version 0.3.0?
 ----------------------------
