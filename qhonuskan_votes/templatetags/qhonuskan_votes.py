@@ -2,6 +2,8 @@ from django import template
 from django.urls import reverse
 from django.utils.html import mark_safe
 
+from qhonuskan_votes.views import handle_pending_vote
+
 register = template.Library()
 
 
@@ -59,3 +61,18 @@ def vote_buttons_for(obj, template_name='qhonuskan/vote_buttons.html'):
         "vote_model": f"{obj._meta.app_label}.{obj._meta.object_name}Vote"
     }
     return mark_safe(t.render(context))
+
+
+@register.simple_tag(takes_context=True)
+def check_pending_vote(context, request):
+    """
+    Checks and processes any pending votes for the current user.
+    """
+
+    print(request)
+    if request and hasattr(request, 'user') and request.user.is_authenticated:
+        handle_pending_vote(request)
+        vote_message = request.session.pop('vote_message', None)
+        if vote_message:
+            return mark_safe(f'<script>alert("{vote_message}");</script>')
+    return ''
