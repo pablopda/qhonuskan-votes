@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_extensions",
     # "django.contrib.humanize", # Handy template tags
     "django.contrib.admin",
     "django.forms",
@@ -102,3 +103,7 @@ TEMPLATES = [
         },
     }
 ]
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+QHONUSKAN_VOTES_LOGIN_URL = '/login/'

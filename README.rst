@@ -81,7 +81,17 @@ Quick Implementation Guide
          path('votes/', include('qhonuskan_votes.urls')),
      ]
 
-6. In your view, you can now use:
+6. (Optional) Set the login URL for unauthenticated users:
+
+   In your project's settings.py, you can specify a custom login URL:
+
+   ::
+
+     QHONUSKAN_VOTES_LOGIN_URL = '/accounts/login/'
+
+   If not set, it will default to Django's LOGIN_URL setting.
+
+7. In your view, you can now use:
 
    ::
 
@@ -94,7 +104,7 @@ Quick Implementation Guide
      # Queryset sorted by vote scores
      items_sorted_by_score = MyModel.sort_by_score.all()
 
-7. In your template, load the required tags and styles:
+8. In your template, load the required tags and styles:
 
    ::
 
@@ -102,10 +112,9 @@ Quick Implementation Guide
      {% get_static_prefix as STATIC_PREFIX %}
 
      <link href="{{ STATIC_PREFIX }}default_buttons.css" rel="stylesheet" type="text/css" />
-     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
      {% voting_script %}
 
-8. Use the vote_buttons_for template tag to create buttons:
+9. Use the vote_buttons_for template tag to create buttons:
 
    ::
 

@@ -1,2 +1,29 @@
 28-02-2012, (0.1.0)
   * Initial release
+
+26-08-2023, (0.3.0)
+  * Updated for Django 3.2 compatibility
+  * Dropped support for Python 2.7, now requires Python 3.6+
+  * Updated setup.py to reflect new Python and Django version requirements
+  * Replaced custom SumWithDefault with Django's Coalesce and Sum in models.py
+  * Updated manager classes in models.py to use new annotation method
+  * Added login_required decorator to vote view for better security
+  * Introduced sum_with_default function in utils.py as an alternative to SumWithDefault
+  * Updated templatetags to use first() instead of get() and simplified filters
+  * Modernized JavaScript in voting_js.html to use vanilla JS and Fetch API
+  * Updated vote_buttons.html to use data attributes
+  * Simplified URL imports in compat.py for Django 2.0+
+  * Updated translation import to use gettext_lazy
+  * Improved error handling and authentication checks in JavaScript
+  * Added CSRF token handling for AJAX requests
+  * Updated classifiers in setup.py to reflect new Python and Django versions
+  * Removed deprecated __unicode__ method, replaced with __str__
+  * Updated Signal usage to remove providing_args (deprecated in Django 3.0)
+
+Backward Incompatibility Notes:
+  * Requires Python 3.6+ and Django 3.2+
+  * JavaScript updates may not work in very old browsers
+  * CSRF token handling might require additional setup in some projects
+  * Database queries might produce slightly different SQL in some edge cases
+  * vote_buttons_for tag now returns a SafeString
+  * Projects using older Django versions might need to update URL configurations

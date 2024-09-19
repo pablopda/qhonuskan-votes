@@ -1,52 +1,40 @@
 {% load qhonuskan_votes static %}
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-        "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Test Application for Qhonuskan Votes</title>
-        <link href="{% static 'default_buttons.css'%}" rel="stylesheet" type="text/css" />
-        <style type="text/css">
-            body {
-                background: #555;
-            }
-            div#wrapper {
-                width: 520px;
-                padding: 20px;
-                margin: 40px auto;
-                background: #fff;
-                border: #000 solid 1px;
-            }
-            div.object {
-                overflow: auto;
-                margin: 0 0 30px 0;
-            }
-            div.object:last-child {
-                margin-bottom: 0;
-            }
-
-            div.vote_buttons {
-                width: 40px;
-                margin-right: 5px;
-                float: left;
-                border: 1px solid #666;
-            }
-        </style>
-
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <!-- <link href="{% static 'default_buttons.css' %}" rel="stylesheet" type="text/css" /> -->
         {% voting_script %}
-
     </head>
-    <body>
-        <div id="wrapper">
+    <body class="bg-gray-600">
+        <!-- Updated login status display with logout button -->
+        <div class="max-w-lg mx-auto mt-5 p-3 bg-white border border-black text-center">
+            {% if user.is_authenticated %}
+                <p>Welcome, {{ user.username }}! You are logged in.</p>
+                <form action="{% url 'logout' %}" method="post" class="mt-2">
+                    {% csrf_token %}
+                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+                        Logout
+                    </button>
+                </form>
+            {% else %}
+                <p>You are not logged in.</p>
+            {% endif %}
+        </div>
+
+        <div class="max-w-lg mx-auto my-10 p-5 bg-white border border-black">
             {% for object in objects %}
-            <div class="object">
-                {% vote_buttons_for object %}
+            <div class="mb-8 overflow-auto last:mb-0">
+                    {% vote_buttons_for object %}
                 <div class="text">
                     {{ object.text }}
                 </div>
             </div>
-           {% endfor %}
+            {% endfor %}
         </div>
     </body>
 </html>

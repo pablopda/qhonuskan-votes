@@ -2,7 +2,29 @@
     function showNotAuthenticatedError() {
         alert("You are not authenticated");
     }
+    function handlePendingVote() {
+        fetch('{% url "handle_pending_vote" %}', {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.vote_message) {
+                alert(data.vote_message);
+                // Optionally, refresh the page or update the UI
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error handling pending vote:', error);
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
+        handlePendingVote();  // Check for pending votes on page load
+
         document.querySelectorAll(".vote_buttons").forEach(function(voteEl) {
             let isVoting = false;
 
@@ -24,7 +46,9 @@
                 })
                 .then(response => {
                     if (response.status === 401) {
-                        throw new Error('Not authenticated');
+                        return response.json().then(data => {
+                            handleUnauthorized(data.login_url, data.next);
+                        });
                     }
                     return response.json();
                 })
@@ -71,5 +95,11 @@
             }
         }
         return cookieValue;
+    }
+
+    function handleUnauthorized(loginUrl, next) {
+        // Redirect to login page
+        window.location.href = loginUrl + '?next=' + encodeURIComponent(next);
+        // After redirect and successful login, the page will reload and handlePendingVote will be called
     }
 </script>
