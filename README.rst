@@ -20,20 +20,19 @@ What's new in version 0.4.0?
 
 * Updated for Django 4.2 compatibility
 * Dropped support for Python 3.6, 3.7, 3.8
+* Support for anonymous user voting with login redirection
+* Return to original URL after login to process pending vote
+* Tailwind CSS design for voting buttons
+* Color change for buttons to indicate user's vote
 
-What's new in version 0.3.0?
-----------------------------
+Requirements
+------------
 
-* Updated for Django 3.2 compatibility
-* Dropped support for Python 2.7, now requires Python 3.6+
-* Replaced custom SumWithDefault with Django's Coalesce and Sum
-* Modernized JavaScript to use vanilla JS and Fetch API
-* Improved error handling and authentication checks
-* Added CSRF token handling for AJAX requests
-* Updated Signal usage to remove deprecated features
+* Python 3.8+
+* Django 4.2+
 
-Quick Implementation Guide
---------------------------
+Installation
+------------
 
 1. Install qhonuskan-votes:
 
@@ -112,7 +111,7 @@ Quick Implementation Guide
      {% get_static_prefix as STATIC_PREFIX %}
 
      <link href="{{ STATIC_PREFIX }}default_buttons.css" rel="stylesheet" type="text/css" />
-     {% voting_script %}
+     {% voting_script user %}
 
 9. Use the vote_buttons_for template tag to create buttons:
 
@@ -120,12 +119,35 @@ Quick Implementation Guide
 
      {% for object in objects %}
        <div class="object">
-         {% vote_buttons_for object %}
+         {% vote_buttons_for object user %}
          <div class="text">
            {{ object.text }}
          </div>
        </div>
      {% endfor %}
+
+Configuration
+-------------
+
+Add the following to your settings.py if you want to use Tailwind CSS for button styling:
+
+.. code-block:: python
+
+    QHONUSKAN_VOTES_USE_TAILWIND = True
+
+Usage
+-----
+
+For anonymous voting support, ensure your login view redirects back to the original URL:
+
+.. code-block:: python
+
+    from django.contrib.auth.views import LoginView
+    from django.urls import reverse_lazy
+
+    class CustomLoginView(LoginView):
+        def get_success_url(self):
+            return self.request.GET.get('next') or reverse_lazy('home')
 
 For more detailed information, please refer to the documentation.
 

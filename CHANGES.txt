@@ -20,10 +20,16 @@
   * Removed deprecated __unicode__ method, replaced with __str__
   * Updated Signal usage to remove providing_args (deprecated in Django 3.0)
 
+15-03-2024, (0.4.0)
+  * Added support for anonymous user voting with login redirection
+  * Implemented return to original URL after login to process pending vote
+  * Introduced new Tailwind CSS design for voting buttons
+  * Fixed and re-enabled color change for buttons to indicate user's vote
+  * Updated minimum Django version to 4.2
+  * Requires Python 3.8+
+
 Backward Incompatibility Notes:
-  * Requires Python 3.6+ and Django 3.2+
-  * JavaScript updates may not work in very old browsers
-  * CSRF token handling might require additional setup in some projects
-  * Database queries might produce slightly different SQL in some edge cases
-  * vote_buttons_for tag now returns a SafeString
-  * Projects using older Django versions might need to update URL configurations
+  * Requires Python 3.8+ and Django 4.2+
+  * Projects using Tailwind CSS may need to update their configurations
+  * Database migrations may be required for new anonymous voting feature
+  * JavaScript updates for handling anonymous voting and button color changes
