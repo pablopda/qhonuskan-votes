@@ -1,5 +1,4 @@
 {% load qhonuskan_votes static %}
-{% check_pending_vote request %}
 <div class="flex items-center space-x-2 vote_buttons" data-model="{{ vote_model }}" data-id="{{ object.id }}">
   <span class="score text-sm font-semibold {% if object.vote_score < 0 %}text-red-500{% else %}text-green-500{% endif %}">
     {% if object.vote_score %}
@@ -8,7 +7,6 @@
       0
     {% endif %}
   </span>
-  
   <div class="flex items-center space-x-1">
     <a href="#" 
       class="upVote p-1 rounded-full hover:bg-gray-100 transition-colors duration-200 {% if object|is_up_voted_by:user %}text-blue-500 voted{% else %}text-gray-500{% endif %}"

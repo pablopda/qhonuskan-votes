@@ -8,9 +8,12 @@ register = template.Library()
 
 
 @register.inclusion_tag('qhonuskan/voting_js.html')
-def voting_script():
+def voting_script(user):
     return {"vote_url": reverse('qhonuskan_vote'),
-            "handle_pending_vote": reverse('handle_pending_vote')}
+            "handle_pending_vote": reverse('handle_pending_vote'),
+            "user_is_authenticated": user.is_authenticated
+            }
+
 
 
 
@@ -47,7 +50,7 @@ def is_down_voted_by(object, user):
 
 
 @register.simple_tag
-def vote_buttons_for(obj, template_name='qhonuskan/vote_buttons.html'):
+def vote_buttons_for(obj, user, template_name='qhonuskan/vote_buttons.html'):
     """
     Takes two parameters. The first is the object the votes are for. And the second is
     the template to use. By default it uses vote_buttons.html.
@@ -59,21 +62,8 @@ def vote_buttons_for(obj, template_name='qhonuskan/vote_buttons.html'):
     t = template.loader.get_template(template_name)
     context = {
         "object": obj,
-        "vote_model": f"{obj._meta.app_label}.{obj._meta.object_name}Vote"
+        "vote_model": f"{obj._meta.app_label}.{obj._meta.object_name}Vote",
+        "user": user
     }
     return mark_safe(t.render(context))
 
-
-@register.simple_tag(takes_context=True)
-def check_pending_vote(context, request):
-    """
-    Checks and processes any pending votes for the current user.
-    """
-
-    print(request)
-    if request and hasattr(request, 'user') and request.user.is_authenticated:
-        handle_pending_vote(request)
-        vote_message = request.session.pop('vote_message', None)
-        if vote_message:
-            return mark_safe(f'<script>alert("{vote_message}");</script>')
-    return ''

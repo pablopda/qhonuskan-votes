@@ -23,7 +23,13 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        handlePendingVote();  // Check for pending votes on page load
+        var user_is_authenticated = {{ user_is_authenticated|yesno:"true,false" }};
+        // Check if the user is logged in before handling pending votes
+        if (user_is_authenticated) {
+            handlePendingVote();  // Check for pending votes on page load
+        }else{
+            console.log("User is not authenticated");
+        }
 
         document.querySelectorAll(".vote_buttons").forEach(function(voteEl) {
             let isVoting = false;

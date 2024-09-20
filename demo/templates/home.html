@@ -8,7 +8,7 @@
         <title>Test Application for Qhonuskan Votes</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <!-- <link href="{% static 'default_buttons.css' %}" rel="stylesheet" type="text/css" /> -->
-        {% voting_script %}
+        {% voting_script request.user %}
     </head>
     <body class="bg-gray-600">
         <!-- Updated login status display with logout button -->
@@ -29,7 +29,7 @@
         <div class="max-w-lg mx-auto my-10 p-5 bg-white border border-black">
             {% for object in objects %}
             <div class="mb-8 overflow-auto last:mb-0">
-                    {% vote_buttons_for object %}
+                    {% vote_buttons_for object user %}
                 <div class="text">
                     {{ object.text }}
                 </div>

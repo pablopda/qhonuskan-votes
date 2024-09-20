@@ -125,8 +125,11 @@ def process_pending_vote(request):
         return vote(request)  # type: ignore
     return None
 
-@login_required
+
 def handle_pending_vote(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({}, status=401)
+    
     vote_response = process_pending_vote(request)
     vote_message = None
     if vote_response:
