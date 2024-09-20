@@ -38,7 +38,7 @@ def _api_view(func):
                 "status": "unauthorized",
                 "message": "Please log in to vote",
                 "login_url": get_login_url(),
-                "next": request.path
+                "next": request.GET.get('next', request.META.get('HTTP_REFERER', '/'))
             }, status=401)
 
         if not request.method == 'POST':

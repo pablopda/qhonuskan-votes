@@ -2,8 +2,6 @@ from django import template
 from django.urls import reverse
 from django.utils.html import mark_safe
 
-from qhonuskan_votes.views import handle_pending_vote
-
 register = template.Library()
 
 
@@ -52,12 +50,12 @@ def is_down_voted_by(object, user):
 @register.simple_tag
 def vote_buttons_for(obj, user, template_name='qhonuskan/vote_buttons.html'):
     """
-    Takes two parameters. The first is the object the votes are for. And the second is
-    the template to use. By default it uses vote_buttons.html.
+    Takes three parameters: the object the votes are for, the user, and the template to use.
+    By default it uses vote_buttons.html.
 
     Usage::
-        {% vote_buttons_for idea %}
-        {% vote_buttons_for idea "app/follow_form.html" %}
+        {% vote_buttons_for idea user %}
+        {% vote_buttons_for idea user "app/follow_form.html" %}
     """
     t = template.loader.get_template(template_name)
     context = {
