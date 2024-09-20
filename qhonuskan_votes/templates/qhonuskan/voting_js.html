@@ -3,7 +3,7 @@
         alert("You are not authenticated");
     }
     function handlePendingVote() {
-        fetch('{% url "handle_pending_vote" %}', {
+        fetch('{{ handle_pending_vote }}', {
             method: 'GET',
             headers: {
                 'X-CSRFToken': getCookie('csrftoken')

@@ -9,7 +9,8 @@ register = template.Library()
 
 @register.inclusion_tag('qhonuskan/voting_js.html')
 def voting_script():
-    return {"vote_url": reverse('qhonuskan_vote')}
+    return {"vote_url": reverse('qhonuskan_vote'),
+            "handle_pending_vote": reverse('handle_pending_vote')}
 
 
 
