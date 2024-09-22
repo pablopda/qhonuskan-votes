@@ -1,4 +1,4 @@
-from qhonuskan_votes.compat import re_path
+from django.urls import re_path
 
 from . import views
 

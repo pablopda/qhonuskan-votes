@@ -1,5 +1,5 @@
 from django.contrib import admin
-from qhonuskan_votes.compat import include, re_path
+from django.urls import include, re_path
 
 from . import views
 
