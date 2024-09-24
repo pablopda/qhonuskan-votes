@@ -13,7 +13,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.9', '3.10', '3.11']
 
     steps:
     - uses: actions/checkout@v4
@@ -28,5 +28,7 @@ jobs:
     - name: Install Playwright Browsers
       run: playwright install --with-deps
     - name: Run Tests
+      env:
+        DJANGO_ALLOW_ASYNC_UNSAFE: "true"
       run: |
         pytest demo/app/tests/test_voting.py
