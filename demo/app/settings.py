@@ -23,8 +23,6 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django_extensions",
-    # "django.contrib.humanize", # Handy template tags
     "django.contrib.admin",
     "django.forms",
     "qhonuskan_votes",
