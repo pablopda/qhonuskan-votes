@@ -107,3 +107,4 @@ TEMPLATES = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 QHONUSKAN_VOTES_LOGIN_URL = '/login/'
+USE_TZ = True

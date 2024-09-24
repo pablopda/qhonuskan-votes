@@ -1,0 +1,4 @@
+-r global.txt
+
+pytest-django
+pytest-playwright

@@ -60,8 +60,18 @@
                 })
                 .then(data => {
                     voteEl.querySelector(".score").textContent = data.score;
-                    voteEl.querySelector("a.upVote").classList.toggle("voted", data.voted_as === 1);
-                    voteEl.querySelector("a.downVote").classList.toggle("voted", data.voted_as === -1);
+                    const upVoteEl = voteEl.querySelector("a.upVote");
+                    const downVoteEl = voteEl.querySelector("a.downVote");
+
+                    // Update upvote button
+                    upVoteEl.classList.toggle("voted", data.voted_as === 1);
+                    upVoteEl.classList.toggle("text-blue-500", data.voted_as === 1);
+                    upVoteEl.classList.toggle("text-gray-500", data.voted_as !== 1);
+
+                    // Update downvote button
+                    downVoteEl.classList.toggle("voted", data.voted_as === -1);
+                    downVoteEl.classList.toggle("text-red-500", data.voted_as === -1);
+                    downVoteEl.classList.toggle("text-gray-500", data.voted_as !== -1);
                 })
                 .catch(error => {
                     if (error.message === 'Not authenticated') {

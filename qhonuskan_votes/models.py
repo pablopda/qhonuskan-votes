@@ -5,6 +5,9 @@ from django.dispatch import Signal
 from django.conf import settings
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
+from typing import Any, Optional, Union
 
 vote_changed = Signal()
 
@@ -113,7 +116,7 @@ class VotesField(object):
                 super(Vote, self).delete(*args, **kwargs)
                 vote_changed.send(sender=self)
 
-            def __str__(self):
+            def __str__(self) -> str:
                 values = {
                     'voter': self.voter.username,
                     'like': _('likes') if self.value > 0 else _('hates'),
