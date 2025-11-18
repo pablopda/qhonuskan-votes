@@ -63,6 +63,7 @@ class VoteService:
                 vote_instance = vote_instances.first()
                 if vote_instance.value == value:
                     # Delete all votes if the user voted the same way (toggle off)
+                    VoteCache.invalidate(vote_model, object_id)
                     vote_instances.delete()
                     voted_as = 0
                     logger.debug(
@@ -169,6 +170,7 @@ class VoteService:
         Returns:
             True if a vote was deleted, False otherwise
         """
+        VoteCache.invalidate(vote_model, object_id)
         deleted_count, _ = vote_model.objects.filter(
             object_id=object_id,
             voter=user

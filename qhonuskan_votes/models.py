@@ -345,8 +345,8 @@ class VotesField:
                 verbose_name_plural = _('Votes')
                 unique_together = ('voter', 'object')
                 indexes = [
-                    models.Index(fields=['object']),
-                    models.Index(fields=['object', 'value']),
+                    models.Index(fields=['object'], name='%(class)s_object_idx'),
+                    models.Index(fields=['object', 'value'], name='%(class)s_object_value_idx'),
                 ]
 
             def save(self, *args, **kwargs):
@@ -404,10 +404,13 @@ class VotesField:
                 # Send pre_vote signal before deletion
                 pre_vote.send(sender=Vote, instance=self, action='delete')
 
+                # Send vote_changed before delete while instance still has valid pk
+                # (used for cache invalidation, doesn't need instance in DB)
+                vote_changed.send(sender=self)
+
                 super(Vote, self).delete(*args, **kwargs)
 
-                # Send signals after deletion
-                vote_changed.send(sender=self)
+                # Send post_vote signal after deletion
                 post_vote.send(sender=Vote, instance=self, action='delete', created=False)
 
             def __str__(self) -> str:

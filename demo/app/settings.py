@@ -10,6 +10,10 @@ DATABASE_NAME = 'demo.db'
 # SECURITY: DEBUG should be False in production. Set DJANGO_DEBUG=False in environment.
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 'yes')
 
+# Hosts/domain names that this Django site can serve
+# In production, set DJANGO_ALLOWED_HOSTS environment variable
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver').split(',')
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

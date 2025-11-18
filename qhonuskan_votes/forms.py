@@ -19,18 +19,22 @@ class VoteForm(forms.Form):
 
     vote_model = forms.CharField(
         required=True,
+        max_length=100,
         error_messages={
             'required': _('Vote model is required.'),
+            'max_length': _('Vote model name is too long.'),
         }
     )
 
     object_id = forms.IntegerField(
         required=True,
         min_value=1,
+        max_value=2147483647,
         error_messages={
             'required': _('Object ID is required.'),
             'invalid': _('Object ID must be a valid integer.'),
-            'min_value': _('Object ID must be a positive integer.'),
+            'min_value': _('Object ID must be greater than 0.'),
+            'max_value': _('Object ID is too large.'),
         }
     )
 

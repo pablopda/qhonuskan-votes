@@ -59,7 +59,7 @@ class VoteCache:
         if score is None:
             # Compute the score from database
             result = vote_model.objects.filter(
-                object__id=object_id
+                object_id=object_id
             ).aggregate(score=sum_with_default("value", default=0))
 
             score = result.get('score', 0)
@@ -119,17 +119,3 @@ class VoteCache:
         """
         for object_id in object_ids:
             cls.get_score(vote_model, object_id)
-
-
-def invalidate_vote_cache(sender, **kwargs):
-    """
-    Signal handler to invalidate cache when a vote changes.
-
-    This handler automatically clears the cached vote score for an object
-    whenever a vote on that object is created, updated, or deleted.
-
-    Args:
-        sender: The Vote instance that was changed.
-        **kwargs: Additional keyword arguments passed by the signal.
-    """
-    VoteCache.invalidate_for_instance(sender)

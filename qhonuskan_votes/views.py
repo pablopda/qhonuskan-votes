@@ -87,7 +87,7 @@ Module Attributes:
 
 from typing import Any, Callable, Optional, Type
 
-from django.db import models
+from django.db import models, IntegrityError, DatabaseError
 from django.http import HttpRequest, JsonResponse
 from django.urls import reverse
 from django.conf import settings
@@ -102,6 +102,8 @@ from qhonuskan_votes.exceptions import (
     InvalidVoteValue,
     VoteValidationError,
     VotePermissionError,
+    VoteNotFound,
+    VoteConflictError,
 )
 
 logger = setup_loghandlers()
@@ -275,6 +277,22 @@ def _api_view(
                 "message": str(e)
             }, status=400)
 
+        except VoteNotFound as e:
+            logger.warning('VoteNotFound: %s', str(e))
+            return JsonResponse({
+                "status": "error",
+                "error_type": "vote_not_found",
+                "message": str(e)
+            }, status=404)
+
+        except VoteConflictError as e:
+            logger.warning('VoteConflictError: %s', str(e))
+            return JsonResponse({
+                "status": "error",
+                "error_type": "vote_conflict",
+                "message": str(e)
+            }, status=409)
+
     return view
 
 @_api_view
@@ -365,12 +383,43 @@ def vote(
         validation, and error responses. The parameters passed to this function
         are already validated.
     """
-    voted_as, score = VoteService.create_or_update_vote(
-        vote_model=model,
-        user=request.user,
-        object_id=object_id,
-        value=value
-    )
+    try:
+        voted_as, score = VoteService.create_or_update_vote(
+            vote_model=model,
+            user=request.user,
+            object_id=object_id,
+            value=value
+        )
+    except IntegrityError as e:
+        logger.error(
+            'Vote IntegrityError (race condition): user_id=%s, model=%s, '
+            'object_id=%s, value=%s, error=%s',
+            request.user.id,
+            model.__name__,
+            object_id,
+            value,
+            str(e)
+        )
+        return JsonResponse({
+            "status": "error",
+            "error_type": "conflict",
+            "message": "Vote conflict - please try again"
+        }, status=409)
+    except DatabaseError as e:
+        logger.error(
+            'Vote DatabaseError: user_id=%s, model=%s, '
+            'object_id=%s, value=%s, error=%s',
+            request.user.id,
+            model.__name__,
+            object_id,
+            value,
+            str(e)
+        )
+        return JsonResponse({
+            "status": "error",
+            "error_type": "database_error",
+            "message": "Database error occurred"
+        }, status=500)
 
     logger.info(
         'Vote recorded: user_id=%s, model=%s, object_id=%s, '
