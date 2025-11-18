@@ -1,0 +1,50 @@
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "B",      # flake8-bugbear
+    "UP",     # pyupgrade
+]
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "B008",   # function call in default argument
+    "B904",   # raise without from (too strict)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"demo/app/tests/*" = ["F403", "F405"]  # Allow star imports in tests
+"**/migrations/*" = ["E501"]           # Migrations can have long lines
+
+[tool.ruff.lint.isort]
+known-first-party = ["qhonuskan_votes"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "demo.app.settings"
+python_files = ["test_*.py"]
+testpaths = ["demo/app/tests"]
+addopts = "-v --tb=short"
+
+[tool.coverage.run]
+source = ["qhonuskan_votes"]
+branch = true
+omit = [
+    "*/migrations/*",
+    "*/tests/*",
+    "*/__init__.py",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]
