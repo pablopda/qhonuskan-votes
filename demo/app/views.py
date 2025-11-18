@@ -26,19 +26,24 @@ def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        
+
         # Check if the user exists
         user = User.objects.filter(username=username).first()
         if user:
-            # User exists, log them in regardless of password
-            login(request, user)
+            # User exists, authenticate with password validation
+            authenticated_user = authenticate(request, username=username, password=password)
+            if authenticated_user is not None:
+                login(request, authenticated_user)
+                return redirect('home')
+            else:
+                # Invalid password
+                return render(request, 'login.html', {'error': 'Invalid username or password'})
         else:
             # User doesn't exist, create a new one and log them in
             user = User.objects.create_user(username=username, password=password)
             login(request, user)
-        
-        return redirect('home')
-    
+            return redirect('home')
+
     return render(request, 'login.html')
 
 def logout_view(request):

@@ -1,3 +1,6 @@
+# Configure the default AppConfig for this application
+default_app_config = 'qhonuskan_votes.apps.QhonuskanVotesConfig'
+
 __version_info__ = {
     'major': 0,
     'minor': 4,  # Increment the minor version

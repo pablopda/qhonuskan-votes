@@ -7,7 +7,8 @@ PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
 ADMIN_MEDIA_PREFIX = '/admin_media/'
 DATABASE_ENGINE = 'sqlite3'
 DATABASE_NAME = 'demo.db'
-DEBUG = True
+# SECURITY: DEBUG should be False in production. Set DJANGO_DEBUG=False in environment.
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 'yes')
 
 DATABASES = {
     'default': {
@@ -52,7 +53,10 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'app.urls'
 
-SECRET_KEY = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcd'
+# SECURITY WARNING: Keep the secret key used in production secret!
+# In production, set DJANGO_SECRET_KEY environment variable to a unique, unpredictable value.
+# The fallback value should only be used for local development.
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'dev-only-insecure-key-change-in-production')
 
 SITE_ID = 1
 
